@@ -137,6 +137,12 @@ function resolveRound() {
       yourChoice: choices[0],
       opponentChoice: choices[1],
     });
+  } else {
+    // Handle draw result
+    broadcastDrawResult({
+      yourChoice: choices[0],
+      opponentChoice: choices[1],
+    });
   }
   players.forEach((player) => {
     player.choice = null;
@@ -148,7 +154,20 @@ function resolveRound() {
     broadcastPlayerList();
   }, 2000);
 }
-
+function broadcastDrawResult(choices) {
+  players.forEach((player) => {
+    player.ws.send(
+      JSON.stringify({
+        type: "roundResult",
+        winner: "Draw",
+        choices: {
+          yourChoice: choices.yourChoice,
+          opponentChoice: choices.opponentChoice,
+        },
+      })
+    );
+  });
+}
 function getRoundWinner(choices) {
   const [choice1, choice2] = choices;
 

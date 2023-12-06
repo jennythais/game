@@ -232,13 +232,19 @@
           }
           function displayResult(winner, choices) {
                const resultElement = document.querySelector('.result');
-               resultElement.textContent = `${winner}'s player wins!`;
+
+               if (winner === 'Draw') {
+                    resultElement.textContent = 'It\'s a Draw!';
+               } else {
+                    resultElement.textContent = `${winner}'s player wins!`;
+               }
 
                const yourChoiceElement = document.getElementById('yourchoice');
                const opponentChoiceElement = document.getElementById('componentsChoice');
 
                opponentChoiceElement.textContent = `Opponent's choice: ${choices.opponentChoice}`;
           }
+
      </script>
 </body>
 
