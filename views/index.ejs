@@ -139,7 +139,8 @@
      <button id="play" onclick="playAgain()">Play again</button>
 
      <script>
-          const ws = new WebSocket('ws://localhost:3000');
+          const PORT = process.env.PORT || 3000;
+          const ws = new WebSocket('ws://localhost:' + PORT);
 
           let playerName;
           let playerList = [];
