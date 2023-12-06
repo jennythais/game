@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Rock Paper Scissors</title>
+     <style>
+          body {
+               padding-top: 30px;
+          }
+
+          h1 {
+               margin: 0 auto;
+               text-align: center;
+               margin-bottom: 50px;
+          }
+
+          #group-wrapper {
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               flex-direction: column;
+               gap: 20px;
+          }
+
+          #nameInput {
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               gap: 10px;
+          }
+
+          #play {
+               display: flex;
+               margin: 0 auto;
+               background-color: #605963;
+               border: none;
+               color: white;
+               padding: 5px 15px;
+               text-align: center;
+               text-decoration: none;
+               font-size: 16px;
+               cursor: pointer;
+               border-radius: 4px;
+          }
+
+          #rock,
+          #paper {
+               margin-right: 40px;
+          }
+
+          #rock,
+          #paper,
+          #scissors {
+               border: none;
+               color: white;
+               padding: 10px 20px;
+               text-align: center;
+               text-decoration: none;
+               display: inline-block;
+               font-size: 16px;
+               cursor: pointer;
+               border-radius: 4px;
+
+          }
+
+          #rock {
+               background-color: #04AA6D;
+          }
+
+          #paper {
+               background-color: #4758a1;
+          }
+
+          #scissors {
+               background-color: #e1d592;
+
+          }
+
+          #joingame {
+               background-color: #8b4bf9;
+               border: none;
+               color: white;
+               padding: 5px 15px;
+               text-align: center;
+               text-decoration: none;
+               display: inline-block;
+               font-size: 16px;
+               cursor: pointer;
+               border-radius: 4px;
+          }
+
+          ul {
+               padding-inline-start: 10px;
+          }
+
+          ul li {
+               font-size: 20px;
+
+          }
+
+          .table {
+               font-size: 17px;
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+          }
+
+          .result {
+               margin-bottom: 14px;
+               font-size: 18px;
+               color: darkgreen;
+          }
+     </style>
+</head>
+
+<body>
+     <h1>Rock Paper Scissors</h1>
+     <div id="nameInput">
+          <label for="playerName">Enter your name:</label>
+          <input type="text" id="playerName" />
+          <button id="joingame" onclick="joinGame()">Join game</button>
+     </div>
+     <div id="group-wrapper">
+          <div id="waiting"></div>
+          <div id="game" style="display: none;">
+               <button id="rock" onclick="makeChoice('rock')">Rock</button>
+               <button id="paper" onclick="makeChoice('paper')">Paper</button>
+               <button id="scissors" onclick="makeChoice('scissors')">Scissors</button>
+          </div>
+          <ul class="list_player"></ul>
+          <div class="table">
+               <div id="yourchoice"></div>
+               <div id="componentsChoice"></div>
+          </div>
+          <div class="result"></div>
+     </div>
+     <button id="play" onclick="playAgain()">Play again</button>
+
+     <script>
+          const ws = new WebSocket('ws://localhost:3000');
+
+          let playerName;
+          let playerList = [];
+
+          ws.onmessage = (event) => {
+               const data = JSON.parse(event.data);
+               handleServerMessage(data);
+          };
+
+          function handleServerMessage(data) {
+               switch (data.type) {
+                    case 'startGame':
+                         showGame();
+                         break;
+                    case 'playerList':
+                         updatePlayerList(data.players);
+                         break;
+                    case 'roundResult':
+                         displayResult(data.winner, data.choices);
+                         break;
+                    case 'waitingList':
+                         updateWaitingList(data.waitingPlayers);
+                         break;
+               }
+          }
+          function joinGame() {
+               playerName = document.getElementById('playerName').value;
+               if (playerName) {
+                    const joinData = { type: 'join', name: playerName };
+                    ws.send(JSON.stringify(joinData));
+                    document.getElementById('nameInput').style.display = 'none';
+                    document.getElementById('waiting').innerHTML = 'Waiting for another player...';
+               }
+          }
+
+          function updateWaitingList(waitingPlayers) {
+               const waitingListElement = document.querySelector('.list_player');
+               waitingListElement.innerHTML = '';
+
+               waitingPlayers.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = player;
+                    waitingListElement.appendChild(li);
+               });
+          }
+
+
+          function showGame() {
+               document.getElementById('game').style.display = 'block';
+               document.getElementById('waiting').style.display = 'none';
+          }
+          function makeChoice(choice) {
+               const choiceData = { type: 'choice', choice };
+               ws.send(JSON.stringify(choiceData));
+               const buttons = document.querySelectorAll('#game button');
+               buttons.forEach(button => {
+                    if (button.textContent.toLowerCase() !== choice) {
+                         button.disabled = true;
+                    }
+               });
+               document.getElementById('yourchoice').textContent = `My choice: ${choice}`;
+          }
+          function playAgain() {
+               const playAgainData = { type: 'playAgain' };
+               ws.send(JSON.stringify(playAgainData));
+               document.querySelector('.result').textContent = '';
+               const buttons = document.querySelectorAll('#game button');
+               buttons.forEach(button => {
+                    button.disabled = false;
+               });
+               document.getElementById('yourchoice').textContent = "";
+               document.getElementById('componentsChoice').textContent = "";
+               document.getElementById('result').textContent = "";
+          }
+
+          function updatePlayerList(players) {
+               playerList = players;
+               const playerListElement = document.querySelector('.list_player');
+               playerListElement.innerHTML = '';
+               players.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = player;
+                    playerListElement.appendChild(li);
+               });
+          }
+          function displayResult(winner, choices) {
+               const resultElement = document.querySelector('.result');
+               resultElement.textContent = `${winner}'s player wins!`;
+
+               const yourChoiceElement = document.getElementById('yourchoice');
+               const opponentChoiceElement = document.getElementById('componentsChoice');
+
+               opponentChoiceElement.textContent = `Opponent's choice: ${choices.opponentChoice}`;
+          }
+     </script>
+</body>
+
+</html>
