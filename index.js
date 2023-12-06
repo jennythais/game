@@ -27,8 +27,16 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    players = players.filter((player) => player.ws !== ws);
-    broadcastPlayerList();
+    // players = players.filter((player) => player.ws !== ws);
+    // broadcastPlayerList();
+    const waitingPlayerIndex = waitingPlayers.findIndex(
+      (player) => player.ws === ws
+    );
+
+    if (waitingPlayerIndex !== -1) {
+      waitingPlayers.splice(waitingPlayerIndex, 1);
+      broadcastWaitingList(); // Notify clients about the updated waiting list
+    }
   });
 });
 
