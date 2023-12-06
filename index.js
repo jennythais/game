@@ -5,8 +5,11 @@ const WebSocket = require("ws");
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+const dotenv = require("dotenv");
 
-// app.use(express.static(path.join(__dirname, "public")));
+// Load environment variables from .env file
+dotenv.config();
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
