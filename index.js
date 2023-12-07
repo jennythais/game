@@ -27,6 +27,7 @@ wss.on("connection", (ws) => {
 
   ws.on("close", () => {
     players = players.filter((player) => player.ws !== ws);
+    removePlayerFromWaitingList(ws);
     broadcastPlayerList();
   });
 });
@@ -44,6 +45,7 @@ function handleClientMessage(ws, data) {
       break;
   }
 }
+
 function handleJoin(ws, name) {
   if (players.length < 2) {
     players.push({ ws, name, choice: null });
@@ -69,6 +71,12 @@ function broadcastWaitingList() {
     );
   });
 }
+
+function removePlayerFromWaitingList(ws) {
+  waitingPlayers = waitingPlayers.filter((player) => player.ws !== ws);
+  broadcastWaitingList();
+}
+
 function handleChoice(ws, choice) {
   const player = players.find((p) => p.ws === ws);
   if (player) {
@@ -81,6 +89,7 @@ function handleChoice(ws, choice) {
     }
   }
 }
+
 function handlePlayAgain(ws) {
   const player = players.find((p) => p.ws === ws);
   if (player) {
@@ -106,6 +115,7 @@ function handlePlayAgain(ws) {
     }
   }
 }
+
 function startGame() {
   console.log("startGame called");
   if (waitingPlayers.length > 0) {
@@ -120,6 +130,7 @@ function startGame() {
     player.ws.send(JSON.stringify({ type: "startGame" }));
   });
 }
+
 function resolveRound() {
   const choices = players.map((player) => player.choice);
   const winner = getRoundWinner(choices);
@@ -144,6 +155,7 @@ function resolveRound() {
     broadcastPlayerList();
   }, 2000);
 }
+
 function broadcastDrawResult(choices) {
   players.forEach((player) => {
     player.ws.send(
@@ -158,6 +170,7 @@ function broadcastDrawResult(choices) {
     );
   });
 }
+
 function getRoundWinner(choices) {
   const [choice1, choice2] = choices;
 
@@ -173,6 +186,7 @@ function getRoundWinner(choices) {
     return choice2;
   }
 }
+
 function broadcastResult(winner, choices) {
   const winningPlayer = players.find((player) => player.choice === winner);
   if (winningPlayer) {
@@ -190,10 +204,12 @@ function broadcastResult(winner, choices) {
     });
   }
 }
+
 function getOpponentChoice(player) {
   const otherPlayer = players.find((p) => p !== player);
   return otherPlayer ? otherPlayer.choice : null;
 }
+
 function broadcastPlayerList() {
   const playerNames = players.map((player) => player.name);
   players.forEach((player) => {

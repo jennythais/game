@@ -144,7 +144,6 @@
 
           const ws = new WebSocket(wsUrl);
 
-
           let playerName;
           let playerList = [];
 
@@ -169,6 +168,7 @@
                          break;
                }
           }
+          
           function joinGame() {
                playerName = document.getElementById('playerName').value;
                if (playerName) {
@@ -178,7 +178,7 @@
                     document.getElementById('waiting').innerHTML = 'Waiting for another player...';
                }
           }
-
+          
           function updateWaitingList(waitingPlayers) {
                const waitingListElement = document.querySelector('.list_player');
                waitingListElement.innerHTML = '';
@@ -190,13 +190,13 @@
                });
           }
 
-
           function showGame() {
                document.getElementById('game').style.display = 'block';
                document.getElementById('waiting').style.display = 'none';
                document.getElementById('play').style.display = 'block';
 
           }
+          
           function makeChoice(choice) {
                const choiceData = { type: 'choice', choice };
                ws.send(JSON.stringify(choiceData));
@@ -209,6 +209,12 @@
                });
                document.getElementById('yourchoice').textContent = `My choice: ${choice}`;
           }
+          
+          const buttonColors = {
+               rock: "#04AA6D",
+               paper: "#4758a1",
+               scissors: "#e1d592",
+          };
           function playAgain() {
                const playAgainData = { type: 'playAgain' };
                ws.send(JSON.stringify(playAgainData));
@@ -216,6 +222,8 @@
                const buttons = document.querySelectorAll('#game button');
                buttons.forEach(button => {
                     button.disabled = false;
+                    const choice = button.textContent.toLowerCase();
+                    button.style.backgroundColor = buttonColors[choice];
                });
                document.getElementById('yourchoice').textContent = "";
                document.getElementById('componentsChoice').textContent = "";
@@ -232,6 +240,7 @@
                     playerListElement.appendChild(li);
                });
           }
+          
           function displayResult(winner, choices) {
                const resultElement = document.querySelector('.result');
 
