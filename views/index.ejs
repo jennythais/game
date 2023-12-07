@@ -204,6 +204,7 @@
                buttons.forEach(button => {
                     if (button.textContent.toLowerCase() !== choice) {
                          button.disabled = true;
+                         button.style.backgroundColor = '#ccc';
                     }
                });
                document.getElementById('yourchoice').textContent = `My choice: ${choice}`;
@@ -237,7 +238,7 @@
                if (winner === 'Draw') {
                     resultElement.textContent = 'It\'s a Draw!';
                } else {
-                    resultElement.textContent = `${winner}'s player wins!`;
+                    resultElement.textContent = `${winner} wins!`;
                }
 
                const yourChoiceElement = document.getElementById('yourchoice');
