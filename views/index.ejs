@@ -32,7 +32,6 @@
           }
 
           #play {
-               display: flex;
                margin: 0 auto;
                background-color: #605963;
                border: none;
@@ -136,7 +135,7 @@
           </div>
           <div class="result"></div>
      </div>
-     <button id="play" onclick="playAgain()">Play again</button>
+     <button id="play" onclick="playAgain()" style="display: none;">Play again</button>
 
      <script>
           const isLocalhost = window.location.hostname === 'localhost';
@@ -195,6 +194,8 @@
           function showGame() {
                document.getElementById('game').style.display = 'block';
                document.getElementById('waiting').style.display = 'none';
+               document.getElementById('play').style.display = 'block';
+
           }
           function makeChoice(choice) {
                const choiceData = { type: 'choice', choice };

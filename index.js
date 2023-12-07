@@ -7,7 +7,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const dotenv = require("dotenv");
 
-// Load environment variables from .env file
 dotenv.config();
 
 app.set("view engine", "ejs");
@@ -29,14 +28,6 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     players = players.filter((player) => player.ws !== ws);
     broadcastPlayerList();
-    // const waitingPlayerIndex = waitingPlayers.findIndex(
-    //   (player) => player.ws === ws
-    // );
-
-    // if (waitingPlayerIndex !== -1) {
-    //   waitingPlayers.splice(waitingPlayerIndex, 1);
-    //   broadcastWaitingList(); // Notify clients about the updated waiting list
-    // }
   });
 });
 
@@ -138,7 +129,6 @@ function resolveRound() {
       opponentChoice: choices[1],
     });
   } else {
-    // Handle draw result
     broadcastDrawResult({
       yourChoice: choices[0],
       opponentChoice: choices[1],
@@ -212,12 +202,6 @@ function broadcastPlayerList() {
     );
   });
 }
-
-// const PORT = process.env.PORT || 3000;
-
-// server.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
 
 const PORT = process.env.PORT || 3000;
 
